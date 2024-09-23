@@ -6,11 +6,11 @@ const authenticator = async (req,res,next)=>{
         const token =req.cookies.token || req.headers.authorization?.split(' ')[1];
         if(!token){
             console.log("token didnt got fetched token:",token);
-             res.status(401).json({code:0,msg:"token didnt recieved"});
+            return res.status(401).json({code:0,msg:"token didnt recieved"});
         }
         const decoded = jwt.verify(token,process.env.SECRET_KEY);
         if(!decoded){
-            res.status(401).json({code:0,msg:"Invalid token"});
+           return res.status(401).json({code:0,msg:"Invalid token"});
         }
         const user = await login.findOne({userName:decoded.userName});
         if (!user) {
@@ -21,7 +21,7 @@ const authenticator = async (req,res,next)=>{
         next();
     }catch(error){
         console.log("error in authenticator",error);
-        res.status(401).json({code:0,msg:"token authenticator error"});
+        return res.status(401).json({code:0,msg:"token authenticator error"});
     }
 }
 module.exports=authenticator;
