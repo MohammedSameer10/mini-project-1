@@ -13,10 +13,10 @@ const loginUser=async (req,res)=>{
       const user= await login.findOne({userName});
       if(!user){
         console.log("user not exist");
-       return res.status(400).json({code:0,msg:"user didnt exist"});
+       return res.status(400).json({code:0,msg:"username not found"});
       }
       if(!bcrypt.compare(password,user.password)){
-       return res.status(400).json({code:0,msg:"invalid password u fool"});
+       return res.status(400).json({code:0,msg:"password is wrong"});
       }
       const token = jwt.sign(
         {userName:user.userName},
@@ -24,17 +24,14 @@ const loginUser=async (req,res)=>{
         {expiresIn:"15m"}
       );
       console.log("user signed in token created succesfully token:",token);
-      const option={
-        expires:new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-        httpOnly:true,
-      }
+      
       user.password=undefined;
       user.token=token;
-      return res.status(201).cookie("token",token,option).json({code:1,msg:"User Signed in succesfully",user})
+      return res.status(201).json({code:1,msg:"login succesfull",JWT:token})
       
     }catch(error){
-       console.log("hi from error",error);
-      return res.status(500).json({code:-1,msg:"Internel server error"});
+       console.log("hi from error in login route",error);
+      return res.status(500).json({code:-1,msg:"Internel server error",error:err});
     }
 } 
 loginRouter.post('/',loginUser);
