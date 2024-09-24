@@ -15,7 +15,7 @@ const loginUser=async (req,res)=>{
         console.log("user not exist");
        return res.status(400).json({code:0,msg:"username not found"});
       }
-      if(!bcrypt.compare(password,user.password)){
+      if(!password===user.password){
        return res.status(400).json({code:0,msg:"password is wrong"});
       }
       const token = jwt.sign(

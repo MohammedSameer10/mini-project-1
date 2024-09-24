@@ -20,6 +20,7 @@ const hostelRoute = async (req, res) => {
     }
 
     const hostelData = {
+      groundFloor: { leftWing: [], rightWing: [] },
       firstFloor: { leftWing: [], rightWing: [] },
       secondFloor: { leftWing: [], rightWing: [] },
       thirdFloor: { leftWing: [], rightWing: [] }
@@ -30,8 +31,14 @@ const hostelRoute = async (req, res) => {
         roomNo: room.roomNo, 
         occupied: room.occupied.length // Fix: Get length of occupied array
       };
-
-      if (room.floor === "1") {
+      if (room.floor === "0") {
+        if (room.wing === "Left") {
+          hostelData.groundFloor.leftWing.push(roomInfo);
+        } else {
+          hostelData.groundFloor.rightWing.push(roomInfo);
+        }
+      }
+    else if (room.floor === "1") {
         if (room.wing === "Left") {
           hostelData.firstFloor.leftWing.push(roomInfo);
         } else {
