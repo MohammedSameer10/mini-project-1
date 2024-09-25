@@ -1,0 +1,57 @@
+.navbar{
+    height: 100vh;
+    width: 5vw;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: white;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 10px;
+    transition: 200ms ease-in;
+    overflow: hidden;
+    box-shadow: 20px 20px 40px 2px rgba(0, 0, 0, 0.1);
+}
+.navbar:hover{
+    width: 20vw;
+    transition: 500ms ease-out;
+}
+.navbar .head{
+    height: 150px;
+    width: 100%;
+}
+.navbar .head img{
+    width: 5vw;
+}
+.navbar .body{
+    height: calc(100%-150px);
+    width: 20vw;
+}
+.navbar .body > div{
+    width: 20vw;
+    height: 50px;
+    padding-left: calc(5vw/2 - 15px);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: rgb(215, 215, 215);
+    border: solid rgb(255, 255, 255) 1px;
+    border-right: 0;
+}
+.navbar .body > div:hover{
+    background-color: rgb(201, 237, 248);
+    transition: 200ms;
+    cursor: pointer;
+}
+.navbar .body > div .icon{
+    font-size: 30px;
+}
+.navbar .body > div p{
+    font-size: 20px;
+    margin-left: 25px;
+}
+.navbar .body .logoutnav{
+    color: red;
+    margin-top: calc(100vh - 360px);
+    border: solid red 1px;
+    border-right: 0;
+}

@@ -5,6 +5,10 @@ import cookie from "js-cookie";
 import Cookies from 'js-cookie';
 import { RiLoader2Fill } from "react-icons/ri";
 
+//import pages
+import Navbar from '../navbar/navbar';
+import Home from '../home/home';
+
 
 
 
@@ -60,7 +64,10 @@ function Main() {
                 <></>
             )}
             {isLoaded != 0 && isAuth != -1 ? (
-                <h1>Fuck You</h1>
+                <>
+                <Navbar />
+                <Home />
+                </>
             ):(<></>)}
         </div>
     )

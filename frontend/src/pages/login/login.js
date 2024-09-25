@@ -6,29 +6,30 @@ import { RiLoader2Fill } from "react-icons/ri";
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 
 
 function Login() {
-
+    const api = "http://www.localhost:8080/api/v1/"
     const navigate = useNavigate();
     //check for authentication token
     const [isAuth, setIsAuth] = useState(-1);
 
-    useEffect(()=>{
+    useEffect(() => {
         const tok = cookie.get("JWT");
 
         if (tok) {
             // ->send the tok to server
-            setTimeout(() => { 
+            setTimeout(() => {
                 navigate("/")
-             }, 1200)
-            
+            }, 1200)
+
         }
         else {
-            setTimeout(() => { 
+            setTimeout(() => {
                 setIsAuth(0)
-             }, 1200)
+            }, 1200)
         }
     })
 
@@ -42,13 +43,39 @@ function Login() {
     const [password, setpassword] = useState('');
     const [isFetching, setIsFetching] = useState(0);
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         setIsFetching(1);
-        setTimeout(() => {
-            setIsFetching(0)
-            cookie.set("JWT","sample")
-            navigate("/");
-        }, 1200)
+        
+        //check for empty
+        if (userName == '' || password ==''){
+            
+        }
+        else{
+            try {
+                const res = await axios.post(api+"login",{
+                    userName: userName,
+                    password: password
+                })
+                console.log(res)
+                setuserName('')
+                setpassword('')
+
+                if(res["data"]["code"] == 1){
+                    cookie.set("JWT",res["data"]["JWT"])
+                    navigate("/")
+                }
+            }
+            catch (err) {
+    
+            }
+        }
+        
+
+
+
+        setIsFetching(0)
+        // cookie.set("JWT", "sample")
+        // navigate("/");
     }
 
 
@@ -124,7 +151,7 @@ function Login() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="loadingAnimation" style={{backgroundColor:"rgb(198, 213, 255)"}}>
+                            <div className="loadingAnimation" style={{ backgroundColor: "rgb(198, 213, 255)" }}>
                                 <RiLoader2Fill className="loadingicon" id='loading' />
                                 <p>Validating...</p>
                             </div>
