@@ -8,9 +8,9 @@ const homePage=async (req,res)=>{
         const Info = await info.findOne({name:userName});
         if(!Info){
             console.log(" 404 user data not found info:",Info);
-            res.status(404).json({code:0,msg:"user data not found"});
+          return  res.status(404).json({code:0,msg:"user data not found"});
         }
-        res.status(201).json(
+       return res.status(201).json(
             {
                 code:1,
                 message: "Successfully retrieved data",
@@ -28,7 +28,7 @@ const homePage=async (req,res)=>{
         )
     }catch(error){
         console.log("Internel server error",error);
-        res.status(500).json({code:-1,msg:"Internel server errpr"});
+       return res.status(500).json({code:-1,msg:"Internel server errpr"});
     }
    
      
