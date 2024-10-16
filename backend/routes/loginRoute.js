@@ -1,5 +1,4 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const loginRouter = express.Router();
 const login = require('../model/logins');
@@ -21,9 +20,8 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ code: 0, msg: "Username not found" });
     }
 
-    // Compare entered password with stored hashed password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    // Check if the entered password matches the stored password
+    if (password !== user.password) { // Simple comparison without hashing
       return res.status(400).json({ code: 0, msg: "Incorrect password" });
     }
 
