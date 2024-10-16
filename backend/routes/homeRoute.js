@@ -25,7 +25,31 @@ const homePage = async (req, res) => {
             return res.status(404).json({ code: -1, msg: "Room not found" });
         }
 
-        // Find the warden details based on the hostel, userType is 'warden' (not roomNo)
+        // Log current user and occupied roommates
+        console.log("Current user:", userName);
+        console.log("Occupied:", room_detail.occupied);
+
+        // Find roommates excluding the current user
+        const roommate_details = await Promise.all(
+            room_detail.occupied
+                .filter(occupant => occupant !== userName) // Exclude current user
+                .map(async (roommate) => {
+                    const roommate_detail = await info.findOne({ name: roommate });
+                    if (roommate_detail) {
+                        return {
+                            name: roommate_detail.name,
+                            email: roommate_detail.email,
+                            phoneNo: roommate_detail.phoneNo
+                        };
+                    }
+                    return null;
+                })
+        );
+
+        // Remove any null results from roommates
+        const valid_roommate_details = roommate_details.filter(detail => detail !== null);
+
+        // Find the warden details based on the hostel (assuming there's only one warden per hostel)
         const warden_detail = await info.findOne({
             hostel: user_detail.hostel,
             userType: 'warden'
@@ -44,26 +68,6 @@ const homePage = async (req, res) => {
         if (!warden_room_detail) {
             return res.status(404).json({ code: -1, msg: "Warden's room not found" });
         }
-
-        // Fetch roommate details from the 'occupied' field of the room details (excluding the current user)
-        const roommate_details = await Promise.all(
-            room_detail.occupied
-                .filter(occupant => occupant !== userName) // Exclude current user
-                .map(async (roommate) => {
-                    const roommate_detail = await info.findOne({ userName: roommate });
-                    if (roommate_detail) {
-                        return {
-                            name: roommate_detail.name,
-                            email: roommate_detail.email,
-                            phoneNo: roommate_detail.phoneNo
-                        };
-                    }
-                    return null;
-                })
-        );
-
-        // Remove any null results from roommates (if some details are not found)
-        const valid_roommate_details = roommate_details.filter(detail => detail !== null);
 
         // Send the response with room details, warden details, and roommate details
         return res.status(200).json({
