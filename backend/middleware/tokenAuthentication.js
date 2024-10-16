@@ -20,8 +20,8 @@ const authenticator = async (req,res,next)=>{
         req.user=decoded;
         next();
     }catch(error){
-        console.log("error in authenticator",error);
-        return res.status(401).json({code:0,msg:"token authenticator error"});
+        console.log("error in authenticator",);
+        return res.status(401).json({code:0,msg:"token got expired"});
     }
 }
 module.exports=authenticator;
