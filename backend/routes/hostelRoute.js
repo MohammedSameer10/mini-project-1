@@ -11,7 +11,7 @@ const hostelRoute = async (req, res) => {
       return res.status(401).json({ code: 0, message: "Hostel name not received in the parameter" });
     }
 
-    // Fetch rooms by hostel name
+    
     const rooms = await hostelDetail.find({ hostel });
     
     if (!rooms.length) {
@@ -29,7 +29,7 @@ const hostelRoute = async (req, res) => {
     rooms.forEach((room) => {
       const roomInfo = { 
         roomNo: room.roomNo, 
-        occupied: room.occupied.length // Fix: Get length of occupied array
+        occupied: room.occupied.length 
       };
       if (room.floor === "0") {
         if (room.wing === "Left") {
