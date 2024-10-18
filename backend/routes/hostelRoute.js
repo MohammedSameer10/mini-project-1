@@ -1,79 +1,54 @@
 const express = require('express');
 const hostelRouter = express.Router();
 const hostelDetail = require('../model/hostelDetails');
+const userDetails = require('../model/userDetails'); 
 
-const hostelRoute = async (req, res) => {
+const availabilityRoute = async (req, res) => {
   try {
-    const { hostel } = req.params;
-    
-    if (!hostel) {
-      console.log(`No hostel: ${hostel} name found in the parameter`);
-      return res.status(401).json({ code: 0, message: "Hostel name not received in the parameter" });
+    const { hostel, floor, wing } = req.body;
+
+    if (!hostel || !floor  || !wing) {
+      console.log("Invalid parameters provided");
+      return res.status(400).json({ code: 0, msg: "Hostel, floor, and wing are required" });
     }
 
-    
-    const rooms = await hostelDetail.find({ hostel });
-    
+    const rooms = await hostelDetail.find({ hostel, floor: String(floor), wing });
+
     if (!rooms.length) {
-      console.log("No rooms found in this hostel");
-      return res.status(201).json({ code: 0, message: "Authentication failed or invalid hostel name" });
+      console.log(`No rooms found for ${hostel} on floor ${floor} in ${wing} wing`);
+      return res.status(404).json({ code: 0, msg: "No rooms found for the specified criteria" });
     }
 
-    const hostelData = {
-      groundFloor: { leftWing: [], rightWing: [] },
-      firstFloor: { leftWing: [], rightWing: [] },
-      secondFloor: { leftWing: [], rightWing: [] },
-      thirdFloor: { leftWing: [], rightWing: [] }
-    };
+    const allWardens = await userDetails.find({ hostel, userType: "warden" });
 
-    rooms.forEach((room) => {
-      const roomInfo = { 
-        roomNo: room.roomNo, 
-        occupied: room.occupied.length 
-      };
-      if (room.floor === "0") {
-        if (room.wing === "Left") {
-          hostelData.groundFloor.leftWing.push(roomInfo);
-        } else {
-          hostelData.groundFloor.rightWing.push(roomInfo);
-        }
-      }
-    else if (room.floor === "1") {
-        if (room.wing === "Left") {
-          hostelData.firstFloor.leftWing.push(roomInfo);
-        } else {
-          hostelData.firstFloor.rightWing.push(roomInfo);
-        }
-      } else if (room.floor === "2") {
-        if (room.wing === "Left") {
-          hostelData.secondFloor.leftWing.push(roomInfo);
-        } else {
-          hostelData.secondFloor.rightWing.push(roomInfo);
-        }
-      } else if (room.floor === "3") {
-        if (room.wing === "Left") {
-          hostelData.thirdFloor.leftWing.push(roomInfo);
-        } else {
-          hostelData.thirdFloor.rightWing.push(roomInfo);
-        }
-      }
-    });
+    const wardenMap = allWardens.reduce((acc, warden) => {
+      acc[warden.roomNo] = warden.name;
+      return acc;
+    }, {});
 
-    console.log(`Hostel Data: ${JSON.stringify(hostelData)}`);
-    return res.status(201).json({
+    const roomData = rooms.map(room => ({
+      roomNo: room.roomNo,
+      occupied: room.occupied.length,
+      capacity: wardenMap[room.roomNo] ? 1 : 4,  
+      warden: wardenMap[room.roomNo] || "None"
+    }));
+
+    console.log(`successfully fetched data for ${hostel} on floor ${floor}, wing ${wing}`);
+
+    return res.status(200).json({
       code: 1,
-      message: "Successfully fetched data",
-      Data: hostelData
+      msg: "Successfully fetched data",
+      data: roomData
     });
 
   } catch (err) {
-    console.log("Internal server error in hostelRoute: ", err);
-    return res.status(501).json({
+    console.error("Internal server error: ", err);
+    return res.status(500).json({
       code: -1,
-      message: "Internal server error while trying to fetch hostel room details",
+      msg: "Internal server error while fetching room details"
     });
   }
 };
 
-hostelRouter.get('/:hostel', hostelRoute);
-module.exports = hostelRouter;
+hostelRouter.post('/availability', availabilityRoute);
+module.exports = hostelRouter;
